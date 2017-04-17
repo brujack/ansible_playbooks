@@ -1,0 +1,17 @@
+- hosts: servers
+  become: true
+  become_method: sudo
+  become_user: root
+  tasks:
+#    - name: allow_unauthenticated
+#      apt: allow_unauthenticated=yes
+    - name: updates apt_cache
+      apt: update_cache=yes
+    - name: dist_upgrade
+      apt: upgrade=dist
+#    - name: autoremoves unused packages
+#      apt: autoremove=yes
+    - name: autoremoves unused packages
+      command: apt-get autoremove -y
+      register: autoremove_result
+      changed_when: "'0 upgraded' not in autoremove_result.stdout"

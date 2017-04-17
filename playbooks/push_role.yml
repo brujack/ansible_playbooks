@@ -1,0 +1,8 @@
+---
+
+- name: Push role configuration
+  handlers:
+    - include: handlers/main.yml
+  hosts: "{{ hosts }}"
+  roles:
+    - { role: "{{ conecrazyrole }}", when: conecrazy_role_flag == True }

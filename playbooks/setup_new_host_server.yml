@@ -1,0 +1,17 @@
+---
+# This will setup a new hosting server
+
+## Run Roles ##
+- name: Run Roles
+  # global handlers need to get called in the correct place in the playbook
+  handlers:
+    - include: handlers/main.yml
+  hosts: servers
+  gather_facts: True
+  sudo: true
+  sudo_user: root
+  vars_files:
+    - targets/{{ target }}
+  roles:
+    - { role: common, when: common_role_flag == True }
+    #- { role: "{{ conecrazyrole }}", when: conecrazy_role_flag == True }

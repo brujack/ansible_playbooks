@@ -1,0 +1,7 @@
+network:
+  gateway: 192.168.1.1
+
+dns:
+  primary: 192.168.1.7
+  secondary: 192.168.1.6
+  domain: 'conecrazy.ca'

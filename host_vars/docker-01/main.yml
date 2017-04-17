@@ -1,0 +1,6 @@
+network:
+  address: "192.168.1.10"
+  hw_address: "fc:aa:14:7f:56:a2"
+
+common_role_flag: True
+run_updates: True

@@ -1,0 +1,11 @@
+---
+
+- name: download ubuntu cloud image
+  handlers:
+    - include: handlers/main.yml
+  hosts: servers
+  gather_facts: True
+  sudo: true
+  sudo_user: root
+  roles:
+    - role: download_ubuntu_cloud_image

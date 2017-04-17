@@ -1,0 +1,9 @@
+[servers]
+docker-01
+compute-01
+#ubuntu
+#ubuntu-server
+#chef
+#chef-test
+#zabbix
+#logstash

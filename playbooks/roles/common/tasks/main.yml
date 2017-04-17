@@ -1,0 +1,55 @@
+---
+#
+# file:  playbooks/roles/common/tasks/main.yml
+#
+
+
+- name: Add docker gpg key
+  apt_key:
+    keyserver: hkp://ha.pool.sks-keyservers.net:80
+    id: 58118E89F3A912897C070ADBF76221572C52609D
+
+- name: Add docker repo
+  apt_repository:
+    repo: deb https://apt.dockerproject.org/repo ubuntu-xenial main
+    state: present
+
+# need this for installing correct version of linux-image-extra
+- name: Read uname
+  shell: uname -r
+  register: uname_output
+
+- name: install packages
+  package:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: "{{ role_packages }}"
+
+- name: add bonding to kernel modules
+  template:
+    src: "{{ template_dir }}/etc/modules"
+    dest: "/etc/modules"
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+
+- name: interfaces bonding setup
+  template:
+    src: "{{ template_dir }}/etc/network/interfaces"
+    dest: "/etc/network/interfaces"
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+
+- name: resolv.conf
+  template:
+    src: "{{ template_dir }}/etc/resolv.conf"
+    dest: "/etc/resolv.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Run dmsetup for Ubuntu 16.04
+  command: dmsetup mknodes

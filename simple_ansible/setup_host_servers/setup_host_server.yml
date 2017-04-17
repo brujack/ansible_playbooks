@@ -1,0 +1,61 @@
+- hosts: servers
+  become: true
+  become_method: sudo
+  become_user: root
+  tasks:
+
+    - name: Add docker gpg key
+      apt_key:
+        keyserver: hkp://ha.pool.sks-keyservers.net:80
+        id: 58118E89F3A912897C070ADBF76221572C52609D
+
+    - name: Add docker repo
+      apt_repository:
+        repo: deb https://apt.dockerproject.org/repo ubuntu-xenial main
+        state: present
+
+    # need this for installing correct version of linux-image-extra
+    - name: Read uname
+      shell: uname -r
+      register: uname_output
+
+    - name: Install list of packages
+      apt: name={{item}} state=installed
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - dmsetup
+        - linux-image-extra-{{ uname_output.stdout }}
+        - linux-image-extra-virtual
+        - docker-engine
+        - apt-transport-https
+        - python-dev
+        - python-pip
+        - vagrant
+        - virtualbox
+        - libvirt-bin
+        #- libvirt-clients
+        - libvirt-daemon-system
+        - kvm
+        - cloud-image-utils
+        - qemu-kvm
+        - qemu-system-x86
+        - qemu-utils
+        - ipxe-qemu
+        #- kvm-ipxe
+        - python-libvirt
+        - dnsmasq-base
+        - bridge-utils
+        - ebtables
+        - ifenslave
+        - upstart
+
+    - name: add bonding to kernel modules
+      lineinfile:
+        dest: /etc/modules
+        regexp: '^# at boot time'
+        insertafter: '^# at boot time'
+        line: 'bonding'
+
+    - name: Run dmsetup for Ubuntu 16.04
+      command: dmsetup mknodes
