@@ -1,0 +1,4 @@
+# This config file holds variables with broadest use
+# The variables will be overridden by any other variable assignment except for role defaults
+
+aws_dns_zone: aws.conecrazy.ca
