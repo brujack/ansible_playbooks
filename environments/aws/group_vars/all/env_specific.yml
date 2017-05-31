@@ -1,8 +1,8 @@
 env: aws
 
 # aws_access_key is via ansible_user
-aws_access_key: AKIAIEDAKNR2JXWRWLBA
-aws_secret_key: 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
+aws_access_key:
+aws_secret_key: 
 
 aws_region: us-east-1
 
