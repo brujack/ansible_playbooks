@@ -1,22 +1,20 @@
-env: aws
-
-# aws_access_key is via ansible_user
-aws_access_key:
-aws_secret_key:
-
-aws_region: ca-central-1
+env: home
 
 file_dir: "{{ role_path }}/files"
 template_dir: "{{ role_path }}/templates"
 
-driver: aws
+driver: kvm
+
+
+common_role_flag: True
+run_updates: True
 
 internal_ipv4: "{{ ansible_eth0.ipv4.address }}"
 external_ipv4: "{{ ansible_eth0.ipv4.address }}"
 internal_ipv4_name: "eth0"
 external_ipv4_name: "eth0"
 
-aws_motd_message: |
+kvm_motd_message: |
   #########################################################
   #  This is a conecrazy server                           #
   #  Interesting Files and Locations:                     #

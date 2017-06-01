@@ -13,5 +13,5 @@
   vars_files:
     - targets/{{ target }}
   roles:
-    - { role: common, when: common_role_flag == True }
+    - { role: host_instance, when: setup_host_flag == True }
     #- { role: "{{ conecrazyrole }}", when: conecrazy_role_flag == True }

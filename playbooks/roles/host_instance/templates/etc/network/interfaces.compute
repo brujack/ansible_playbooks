@@ -26,8 +26,8 @@ auto bond0
 
 auto br0
 	iface br0 inet static
-	hwaddress ether {{ network.hw_address }}
-	address {{ network.address }}
+	hwaddress ether {{ compute_network_hw_address }}
+	address {{ compute_network_address }}
 	netmask 255.255.255.0
 	network 192.168.1.0
 	broadcast 192.168.1.255
@@ -39,5 +39,5 @@ auto br0
 	bridge_stp off
 
 # dns-* options are implemented by the resolvconf package, if installed
-dns-nameservers {{ dns.primary }} {{ dns.secondary }}
-dns-search {{ dns.domain }}
+dns-nameservers {{ home_dns_primary }} {{ home_dns_secondarydns.secondary }}
+dns-search {{ home_dns_zone }}

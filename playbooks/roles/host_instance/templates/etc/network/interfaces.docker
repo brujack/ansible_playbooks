@@ -1,0 +1,43 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The bond interface
+auto eno1
+	iface eno1 inet manual
+	bond-master bond0
+
+auto enp4s0
+	iface enp4s0 inet manual
+	bond-master bond0
+
+auto bond0
+	iface bond0 inet manual
+	bond-mode 4
+	bond-miimon 100
+	bond-lacp-rate 1
+	xmit_hash_policy layer3+4
+	bond-slaves en0 enp4s0
+
+auto br0
+	iface br0 inet static
+	hwaddress ether {{ docker_network_hw_address }}
+	address {{ docker_network_address }}
+	netmask 255.255.255.0
+	network 192.168.1.0
+	broadcast 192.168.1.255
+	gateway 192.168.1.1
+	bridge_ports bond0
+	bridge_fd 9
+	bridge_hello 2
+	bridge_maxage 12
+	bridge_stp off
+
+# dns-* options are implemented by the resolvconf package, if installed
+dns-nameservers {{ home_dns_primary }} {{ home_dns_secondarydns.secondary }}
+dns-search {{ home_dns_zone }}

@@ -1,0 +1,14 @@
+# This config file holds variables with broadest use
+# The variables will be overridden by any other variable assignment except for role defaults
+
+aws_dns_zone: aws.conecrazy.ca
+
+home_dns_primary: 192.168.1.7
+home_dns_secondary: 192.168.1.6
+home_dns_zone: 'conecrazy.ca'
+
+home_network_gateway: 192.168.1.1
+
+docker_gpg_keyserver: "hkp://ha.pool.sks-keyservers.net:80"
+docker_gpg_id: "58118E89F3A912897C070ADBF76221572C52609D"
+docker_repo: "deb https://apt.dockerproject.org/repo ubuntu-xenial main"

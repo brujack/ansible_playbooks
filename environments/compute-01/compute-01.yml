@@ -1,0 +1,7 @@
+host: compute-01
+
+compute_network_address: "192.168.1.9"
+compute_network_hw_address: "fc:aa:14:7e:64:b8"
+
+setup_host_flag: True
+run_updates: True

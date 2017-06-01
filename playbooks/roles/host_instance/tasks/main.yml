@@ -1,6 +1,6 @@
 ---
 #
-# file:  playbooks/roles/host_instance/tasks/main.yml
+# file:  playbooks/roles/common/tasks/main.yml
 #
 
 
@@ -34,25 +34,14 @@
     mode: 0644
     backup: yes
 
-- name: interfaces bonding setup compute
+- name: interfaces bonding setup
   template:
-    src: "{{ template_dir }}/etc/network/interfaces.compute"
+    src: "{{ template_dir }}/etc/network/interfaces"
     dest: "/etc/network/interfaces"
     owner: root
     group: root
     mode: 0644
     backup: yes
-  when: host == compute-01
-
-- name: interfaces bonding setup docker
-  template:
-    src: "{{ template_dir }}/etc/network/interfaces.docker"
-    dest: "/etc/network/interfaces"
-    owner: root
-    group: root
-    mode: 0644
-    backup: yes
-  when: host == docker-01
 
 - name: resolv.conf
   template:
