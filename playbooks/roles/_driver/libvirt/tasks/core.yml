@@ -1,0 +1,20 @@
+- include: domain_id.yml
+
+## TODO: If we need extra disks, lets move this forward
+# - include: extra_disk.yml
+#   disk: "{{ item }}"
+#   with_items: "{{ kvm.libvirt_extra_disks }}"
+
+- include: configdrive.yml
+
+- include: base_image.yml
+
+- include: virsh_install.yml
+
+# TODO: We may want to limit this to a set of vms
+- include: list.yml
+  when: libvirt_all_domains is not defined
+
+- include: autostart.yml
+
+# - include: mac_and_ip.yml

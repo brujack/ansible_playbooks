@@ -1,0 +1,20 @@
+---
+- name: base_image | use generic
+  command: >
+    cp
+    {{ libvirt_base_image }}
+    {{ libvirt_result_domain_name }}.qcow2
+  args:
+    chdir: "{{ libvirt_images_path }}"
+    creates: "{{ libvirt_images_path }}/{{ libvirt_result_domain_name }}.qcow2"
+  register: libvirt_generic_copy_image_result
+  # when: libvirt_base_image_mode == 'generic'
+
+- name: base_image | resize
+  command: >
+    qemu-img resize
+    {{ libvirt_result_domain_name }}.qcow2
+    {{ libvirt_vm_disk_size }}
+  args:
+    chdir: "{{ libvirt_images_path }}"
+  when: (libvirt_vm_disk_size is defined) and (libvirt_generic_copy_image_result.changed|bool == true)

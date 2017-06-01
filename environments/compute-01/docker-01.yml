@@ -5,3 +5,33 @@ docker_network_hw_address: "fc:aa:14:7f:56:a2"
 
 setup_host_flag: True
 run_updates: True
+
+role_packages:
+  - { name: apt-transport-https, state: present }
+  - { name: ca-certificates, state: present }
+  - { name: dmsetup, state: present }
+  - { name: "linux-image-extra-{{ uname_output.stdout }}", state: present }
+  - { name: linux-image-extra-virtual, state: present }
+  - { name: docker-engine, state: present }
+  - { name: apt-transport-https, state: present }
+  - { name: python-dev, state: present }
+  - { name: python-pip, state: present }
+  - { name: vagrant, state: present }
+  - { name: virtualbox, state: present }
+  - { name: libvirt-bin, state: present }
+  #- { name: libvirt-clients, state: present }
+  - { name: libvirt-python, state: present }
+  - { name: libvirt-daemon-system, state: present }
+  - { name: kvm, state: present }
+  - { name: cloud-image-utils, state: present }
+  - { name: qemu-kvm, state: present }
+  - { name: qemu-system-x86, state: present }
+  - { name: qemu-utils, state: present }
+  - { name: ipxe-qemu, state: present }
+  #- { name: kvm-ipxe, state: present }
+  - { name: python-libvirt, state: present }
+  - { name: dnsmasq-base, state: present }
+  - { name: bridge-utils, state: present }
+  - { name: ebtables, state: present }
+  - { name: ifenslave, state: present }
+  - { name: upstart, state: present }

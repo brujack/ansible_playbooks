@@ -1,0 +1,117 @@
+kvm:
+  # host access ports
+  #  0 => new port from counter from libvirt_xxx_base_port
+  # -1 => no port is forwarded
+  # >0 => use this host port
+  host_ports:
+    ssh: 0 # port forwarded from the host to the VM ssh
+
+  # basic arguments
+  groups: [] # names of Ansible nodes/groups used to provision the domain
+  name: # name/uuid of the domain (empty means new uuid, and a new vm each run)
+  title: '' # title of the vm
+  description: '' # description of the vm
+  # apt_mirror: ''
+
+  eth_name: "eth1"
+  eth_inet_source: "10.24.4.0/22"
+  eth_inet_ip: "" ## set by facts (maybe?)
+  ethx_ipv4_address: "{{ ((ansible_eth1 | default({}, true)).ipv4 | default({}, true)).address | default('', true) }}"
+  driver_repository_server: "kvm-02-gw.lab-net"
+
+  # default VM configuration
+  vm:
+    memory: "512" # RAM memory available to the VM (int)
+    vcpu: 1 # number of cores designated to the VM
+    vcpu_placement: 'static' # options 'auto', 'static', defaults to 'numatune'
+    vcpu_cpuset: [] # list of host CPU numbers the VM can run on
+    networks: ['vagrant-libvirt'] # libvirts id of networks this VM is part of
+    disk_size: "12G" # use this to change first disk size
+    features: ['acpi', 'apic', 'pae'] # vm features available
+
+  configdrive:
+    meta_data: "instance-id: {{ libvirt_result_domain_name | default('', true) }}; local-hostname: {{ libvirt_result_domain_name | default('', true) }}\n"
+      # instance-id: "{{ libvirt_result_domain_name | default('', true) }}"
+      # local-hostname:  "{{ libvirt_result_domain_name | default('', true) }}"
+
+    # content of the user data (skipped if empty)
+    user_data: |
+      #cloud-config
+      preserve_hostname: False
+      hostname: {{ libvirt_result_domain_name | default('', true) }}
+      fqdn: {{ libvirt_result_domain_name | default('', true) }}.klip-net
+
+      # Remove cloud-init when finished with it
+      runcmd:
+        - [ yum, -y, remove, cloud-init ]
+
+      # Configure where output will go
+      output:
+        all: ">> /var/log/cloud-init.log"
+
+      # configure interaction with ssh server
+      ssh_svcname: ssh
+      ssh_deletekeys: True
+      ssh_genkeytypes: ['rsa', 'ecdsa']
+
+      # Install my public ssh key to the first user-defined user configured
+      # in cloud.cfg in the template (which is centos for CentOS cloud images)
+      ssh_authorized_keys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOh2UGpXJ5uMD2ImXeXIVE7YsLz+byDoXcCWTuj5PKb2zjPtuSmocIl/24bovA6ToJyOEH6Qe4RMtHeXA//TNijjCg9wjCovgwFshEvUtgs8lY/Uw/jxjbzSqfXJr78+gHg1Z7/Wxm+J+lpkQCkG2dUTEzIpjYeV2OUVWc/a/rtzzozmTKA90A7on4cvbYh3u1e30yyYR0HkYHt0sITwH6dybFTHAV6C5Q2IQNwN5Mgh2NbvtTJGbBJLiQnrGcWGnkY5kbsPx9/jUyonUF3B6B4QBr9K8tEIYw/uvVVcekdVSU2Hj6bawoNWYPw3cQHZ3EAJxeb+ad0+F1yY4tdRtR shared_tunnel_key
+
+      write_files:
+        - path: /etc/sysconfig/network-scripts/ifcfg-eth1
+          content: |
+            DEVICE=eth1
+            BOOTPROTO=dhcp
+            ONBOOT=yes
+
+      runcmd:
+        - [ifup, eth1]
+        - sed -i 's/^.*\(ssh-rsa.*\).*$/\1/' /root/.ssh/authorized_keys
+
+
+
+  base_image:
+    file: CentOS-7-x86_64-GenericCloud.qcow2 # path to the cloud image for the domain
+    mode: 'generic' # options: snapshot, copy, generic
+
+
+
+############################################
+######  libVirt Arguments - No Touchy  #####
+############################################
+libvirt_images_path: "/vm_home/kvm/images" # path on the host, where all the images are stored
+libvirt_base_image: "{{libvirt_images_path}}/{{ (kvm.base_image | default({}, true)).file | default('', true) }}" # path to the cloud image for the domain
+libvirt_base_image_mode: "{{ (kvm.base_image | default({}, true)).mode | default('snapshot', true) }}" # options: snapshot, copy
+libvirt_install_type: "{{ kvm.install_type | default('base-image', true) }}" # way to install the VM (this only affects the first run!)
+libvirt_autostart: "{{ kvm.autostart | default(true, true) }}" # should the domain VM start after reboot of the host
+
+libvirt_configdrive_default_meta_data:
+  hostname: "{{ libvirt_result_domain_name | default('', true) }}"
+  username: 'superdave'
+  groups: 'root'  # comma separated string!
+  inject_user_password: True
+  admin_pass: 'P1sswOrD'
+  authorized_keys: ''
+
+libvirt_configdrive_meta_data: "{{ (kvm.configdrive | default({}, true)).meta_data | default(libvirt_configdrive_default_meta_data, true) }}"
+
+# file structure inside the configdrive
+libvirt_configdrive_files: "{{ libvirt_configdrive_base_files }}"
+
+libvirt_configdrive_user_data: "{{ (kvm.configdrive | default({}, true)).user_data | default('', true) }}"
+
+libvirt_configdrive_base_files:
+  'meta-data': '{{ libvirt_configdrive_meta_data }}'
+  'user-data': '{{ libvirt_configdrive_user_data }}'
+
+libvirt_extra_disks: [] #"{{ kvm.extra_disks | default([], true) }}"
+
+libvirt_vm_memory: "{{ (kvm.vm | default({}, true)).memory | default('512', true) }}" # RAM memory available to the VM
+libvirt_vm_vcpu: "{{ (kvm.vm | default({}, true)).vcpu | default('1', true) }}" # number of cores designated to the VM
+libvirt_vm_vcpu_placement: "{{ (kvm.vm | default({}, true)).vcpu_placement | default('static', true) }}" # options 'auto', 'static', defaults to 'numatune'
+libvirt_vm_vcpu_cpuset: "{{ (kvm.vm | default({}, true)).vcpu_cpuset | default([], true) }}" # list of host CPU numbers the VM can run on
+libvirt_vm_networks: "{{ (kvm.vm | default({}, true)).networks | default(['default'], true) }}" # libvirts id of networks this VM is part of
+libvirt_vm_disk_size: "{{ (kvm.vm | default({}, true)).disk_size | default('12G', true) }}" # use this to change first disk size
+libvirt_vm_features: "{{ (kvm.vm | default({}, true)).features | default(['acpi', 'apic', 'pae'], true) }}" # vm features available

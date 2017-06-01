@@ -1,0 +1,52 @@
+---
+- name: (kvm) Build Domain
+  hosts: kvm
+  gather_facts: True
+  vars_files:
+    - targets/{{ target }}
+  tasks:
+    - name: (kvm) Displaying Full Facts
+      debug:
+        var: "{{ item }}"
+        verbosity: 1
+      with_items:
+        - kvm
+    - include: roles/_driver/libvirt/tasks/core.yml
+    - name: (kvm) Capture new hosts for local provisioning
+      add_host:
+        groups: launched
+        hostname: "{{ libvirt_result_domain_name }}.conecrazy.ca"
+        ansible_host: "{{ libvirt_result_domain_name }}.conecrazy.ca"
+  tags:
+    - build
+
+- name: (ansible controller) Waiting for guest to be available
+  hosts: kvm
+  gather_facts: True
+  tasks:
+    - name: (kvm) Checking SSH port on guest
+    # Pause for a bit to build host dns.
+      pause:
+        seconds: 60
+    - name: (kvm) Checking SSH port on guest
+      wait_for:
+        host: "{{ hostvars[groups['kvm'][0]].libvirt_result_domain_name }}.conecrazy.ca"
+        port: 22
+        timeout: 60 # seconds
+  tags:
+    - build
+
+- name: (kvm guest) Full Provisioning
+  hosts: launched
+  gather_facts: True
+  handlers:
+    - include: handlers/main.yml
+  pre_tasks:
+    - name: Setting missing fact (todo find rc)
+      set_fact:
+        ansible_distribution_major_version: "7"
+  roles:
+    - { role: common }
+    - { role: "{{role|default('')}}", when: role is defined}
+  tags:
+    - provision

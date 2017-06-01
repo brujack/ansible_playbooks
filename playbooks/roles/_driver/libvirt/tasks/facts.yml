@@ -1,0 +1,55 @@
+---
+- name: initialize driver | check given driver
+  assert:
+    that: >
+      (kf.driver is defined)
+      and (kf.driver == "kvm")
+  tags:
+  - facts
+
+# - name: initialize driver | check given role
+#   assert:
+#     that: >
+#       (kf.role is defined)
+#   tags:
+#   - facts
+
+- name: initialize driver | determine eth name
+  set_fact:
+    kf_eth_name: >-
+      {{
+        kvm.eth_name
+          if (kf.driver == 'kvm')
+      }}
+  tags:
+  - facts
+
+- name: initialize driver | determine eth source
+  set_fact:
+    kf_eth_inet_source: >-
+      {{
+        kvm.eth_inet_source
+          if (kf.driver == 'kvm')
+      }}
+  tags:
+  - facts
+
+- name: initialize driver | determine repository
+  set_fact:
+    kf_driver_repository_server: >-
+      {{
+        kvm.driver_repository_server
+          if (kf.driver == 'kvm')
+      }}
+  tags:
+  - facts
+
+- name: initialize driver | determine server ip on ethx
+  set_fact:
+    kf_ethx_ipv4_address: >-
+      {{
+        kvm.ethx_ipv4_address
+          if (kf.driver == 'kvm')
+      }}
+  tags:
+  - facts

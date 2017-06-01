@@ -1,0 +1,31 @@
+---
+
+- debug:
+    msg: "{{libvirt_configdrive_base_files}}"
+
+- debug:
+    var: libvirt_configdrive_files
+
+- name: ConfigDrive | directories
+  file:
+    path: '{{ libvirt_images_path }}/{{ libvirt_result_domain_name }}.configdrive/{{ item.key | dirname }}'
+    state: directory
+  with_dict: "{{libvirt_configdrive_files}}"
+
+- name: ConfigDrive | content
+  copy:
+    dest: '{{ libvirt_images_path }}/{{ libvirt_result_domain_name }}.configdrive/{{ item.key }}'
+    content: '{{ item.value }}'
+  with_dict: "{{libvirt_configdrive_files}}"
+  register: libvirt_configdrive_result
+
+- stat:
+    path: "{{ libvirt_images_path }}/{{ libvirt_result_domain_name }}.configdrive.iso"
+  register: configdrive_iso
+
+- name: ConfigDrive | iso image
+  command: >
+    genisoimage -joliet -volid cidata
+    -o {{ libvirt_images_path }}/{{ libvirt_result_domain_name }}.configdrive.iso
+    -r {{ libvirt_images_path }}/{{ libvirt_result_domain_name }}.configdrive
+  when: configdrive_iso.stat.exists == False or libvirt_configdrive_result.changed
