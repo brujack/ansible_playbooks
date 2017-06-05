@@ -1,8 +1,7 @@
 ---
 #
-# file:  playbooks/roles/common/tasks/main.yml
+# file:  playbooks/roles/host_instance/tasks/main.yml
 #
-
 
 - name: Add docker gpg key
   apt_key:
@@ -34,14 +33,25 @@
     mode: 0644
     backup: yes
 
-- name: interfaces bonding setup
+- name: interfaces bonding setup compute
   template:
-    src: "{{ template_dir }}/etc/network/interfaces"
+    src: "{{ template_dir }}/etc/network/interfaces.compute"
     dest: "/etc/network/interfaces"
     owner: root
     group: root
     mode: 0644
     backup: yes
+  when: host == compute-01
+
+- name: interfaces bonding setup docker
+  template:
+    src: "{{ template_dir }}/etc/network/interfaces.docker"
+    dest: "/etc/network/interfaces"
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  when: host == docker-01
 
 - name: resolv.conf
   template:
