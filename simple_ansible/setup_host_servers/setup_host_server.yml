@@ -50,6 +50,7 @@
         - ebtables
         - ifenslave
         - upstart
+        - jnettop
 
     - name: add bonding to kernel modules
       lineinfile:
