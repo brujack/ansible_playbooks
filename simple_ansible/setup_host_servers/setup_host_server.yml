@@ -51,6 +51,7 @@
         - ifenslave
         - upstart
         - jnettop
+        - htop
 
     - name: add bonding to kernel modules
       lineinfile:
