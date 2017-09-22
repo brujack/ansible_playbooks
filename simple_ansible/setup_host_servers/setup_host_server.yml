@@ -27,7 +27,7 @@
         - dmsetup
         - linux-image-extra-{{ uname_output.stdout }}
         - linux-image-extra-virtual
-        - docker-engine
+        - docker.io
         - apt-transport-https
         - python-dev
         - python-pip
