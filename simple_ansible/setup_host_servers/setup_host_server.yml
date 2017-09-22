@@ -35,7 +35,7 @@
         - virtualbox
         - libvirt-bin
         #- libvirt-clients
-        - libvirt-python
+        #- libvirt-python
         - libvirt-daemon-system
         - kvm
         - cloud-image-utils
